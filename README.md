@@ -151,9 +151,7 @@
     const Post = require("./Post");
     const Following = require("./Following");
 
-    /*
-        User Schema (모델의 구조)
-    */
+    /* User Schema (모델의 구조) */
 
     const userSchema = new Schema({
         // 이메일
