@@ -139,38 +139,125 @@
 
 3. 각 models 파일 설정하기
 
-    3-1. User.js
+**:nine: 미들웨어 설정하기**
+
+>클라이언트와 서버 중간에서 처리 역할 담당  
+-> 요청과 응답 사이에서 여러가지 일을 처리한다.
+
+1. 경로 : server/middlewares
+
+2. middlewares 하위 파일 생성 목록
+    * auth.js - 인증 처리
+    * loginValidator.js - 로그인 폼데이터 유효성 검사
+    * signUpValidator.js - 가입 폼데이터 유효성 검사
+    * upload.js - 파일 처리
+
+3. 용어 정리
+    ```html
+    DBMS - DataBase Management System
+    예) 몽고DB, 오라클, MySQL
+    요청 - 헤더 바디
+    헤더 - 메타 데이터
+    바디 - 실제 데이터 (유저가 입력한 데이터)
+    ```
+
+**:keycap_ten: 컨트롤러 설정하기**
+
+> 애플리케이션의 로직 (실질적인 클라이언트 요청 처리 부분)
+
+1. 경로 : server/controllers
+
+2. controllers 하위 파일 생성 목록
+    * userController.js - 유저 로직
+    * postController.js - 게시물 로직
+    * commentController.js - 댓글 로직
+    * profileController.js - 프로필 로직
+
+**:one::one: 라우터 설정하기**
+
+> 사용자의 요청과 적절한 리소스를 연결한다. (서버가 제공하는 서비스 목록)
+
+1. 경로 :  server/routes
+
+2. index.js 기존 내용 삭제 후 작성
+
+**:one::two: app 모듈 설정하기**
+
+1. 경로 : server/app.js
+
+2. app.js 기존 내용 삭제 후 작성
+
+**:one::three: seed 데이터 설정**
+
+> 샘플 데이터 생성 처리
+
+1. 경로 : server/seed.js
+
+2. seed.js 생성 후 내용 작성
+
+3. 씨드데이터 생성 명령어
+
+    3-1. 경로 : server/
+
+    3-2. node seed .env의 데이터베이스 주소
+        
+    ```js
+    node seed "mongodb://127.0.0.1:27017/instagram_clone_db"
+    ```
+    3-3. 몽고db에서 데이터가 잘 추가 되었는지 확인
+
+***
+### POSTMAN - 서버 테스트 도구
+
+1. postman 가입 및 설치
+
+2. 사용방법
+    
+    2-1. 세팅하기
+    ```html
+    workspaces -> my workspace -> create new collection(+버튼) ->
+    blank collection -> 생성후 (점3개) 메뉴 클릭 후 이름 변경(instagram-api) -> Add request -> 상단부분에서 이름(index) 및 router 변경 -> localhost:3000/api 치고 Send
+    ```
+    2-2. 라우터 및 테스트 경로 설정
+    ```html
+    (각 확인하려는 파일에 맞게 작성한다. localhost:3000/api/users)
+
+    (postman 테스트 시 body 탭의 index.js router 연결에 맞게 Post로 설정 (테스트할때마다 맞게 바꿔준다. 토큰이 필요한 경우 Auth 에서 bearer Token 설정) 
+    raw, json 설정 후 테스트 코드작성
+    ```
+
+    2-3. 팔로우 처럼 params 관련 테스트 시 쿼리스트링 이용 
+    ```html
+    localhost:3000/api/profiles?following=jobs
+    ```
+
+    2-4. 작성 예시
+    ```js
+    {
+        "email": "lbsafe@example.com",
+        "name": "test",
+        "username": "lbsafe",
+        "password": "12345"
+    }
+    ```
+
+    2-5. 변경사항이 생기면 저장해준다.
+
+3. 개발 서버 실행하는 명령어 추가
+
+    3-1. 경로: package.json / scripts
 
     ```js
-    // require (ES5) = import (ES6)
-    // crypto - 암호화 기능
-    const mongoose = require("mongoose");
-    const Schema = mongoose.Schema;
-    const jwt = require("jsonwebtoken");
-    const crypto = require("crypto");
-    const Post = require("./Post");
-    const Following = require("./Following");
+    // "start:watch": "nodemon ./bin/www" 추가
 
-    /* User Schema (모델의 구조) */
+    "scripts": {
+        "start": "node ./bin/www",
+        "start:watch": "nodemon ./bin/www"
+    },
+    ```
 
-    const userSchema = new Schema({
-        // 이메일
-        email: { type: String, minLength: 5 },
-        // 비밀번호
-        password: { type: String, minLength: 5 },
-        // 비밀번호 암호화에 사용되는 키
-        salt: { type: String },
-        // 아이디
-        username: { type: String, minLength: 3, required: true },
-        // 이름
-        name: { type: String },
-        // 프로필 사진
-        avatar: { type: String, default: "default.png" },
-        // 자기 소개
-        bio: { type: String },
-    }, { // 옵션
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true }
-    });
+    3-2. 개발 서버 실행 명령어 (server/)
+    ```html
+    npm run start:watch
     ```
 ***
