@@ -17,15 +17,15 @@ const createError = require("http-errors");
 */
 
 exports.feed = async (req, res, next) => {
-    try{
-        const followingDocs = await Following.find({user: req.user._id});
+    try {
+        const followingDocs = await Following.find({ user: req.user._id });
 
         // 로그인 유저가 팔로우 하는 유저들
         const followings = followingDocs
             .map(followingDoc => followingDoc.following);
-        
+
         // 검색 조건 - 로그인 유저가 팔로우하는 유저들과 본인
-        const where = {user: [...followings, req.user._id]};
+        const where = { user: [...followings, req.user._id] };
 
         // 클라이언트에 데이터를 전송할 때 한번에 보낼 도큐먼트의 수
         // (한 페이지 게시물 갯수)
@@ -42,10 +42,10 @@ exports.feed = async (req, res, next) => {
             .populate("commentCount") // 댓글의 갯수
             .populate({ // 로그인 유저가 게시물에 좋아요 했는지 여부
                 path: "liked",
-                match: {user: req.user._id}
+                match: { user: req.user._id }
             })
             // 생성일 기준 내림차순으로 정렬
-            .sort({createdAt: "desc"})
+            .sort({ createdAt: "desc" })
             .skip(skip)
             .limit(limit)
 
@@ -53,24 +53,24 @@ exports.feed = async (req, res, next) => {
         const postCount = await Post.countDocuments(where);
 
         // 서버의 응답
-        res.json({posts, postCount});
+        res.json({ posts, postCount });
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
 exports.find = async (req, res, next) => {
-    try{
+    try {
         // 검색 조건
         const where = {};
 
         // 조건1 - 타임라인 (특정 유저의 게시물 목록) 검색
-        if("username" in req.query){
+        if ("username" in req.query) {
             // 타임라인을 볼 프로필
-            const user = await User.findOne({username: req.query.username});
+            const user = await User.findOne({ username: req.query.username });
 
             // 유저가 없는 경우 404 처리
-            if(!user){
+            if (!user) {
                 throw new createError.NotFound("User is not found");
             }
 
@@ -82,19 +82,19 @@ exports.find = async (req, res, next) => {
         const posts = await Post
             .find(where)
             .populate("commentCount") // 댓글 갯수
-            .sort({createdAt: "desc"}); // 생성일 기준 내림차순 정렬
+            .sort({ createdAt: "desc" }); // 생성일 기준 내림차순 정렬
 
         // 총 게시물 갯수
         const postCount = await Post.countDocuments(where);
 
-        res.json({posts, postCount});
+        res.json({ posts, postCount });
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
 exports.findOne = async (req, res, next) => {
-    try{
+    try {
         // 게시물 검색
         const post = await Post.findById(req.params.id)
             .populate({
@@ -104,28 +104,28 @@ exports.findOne = async (req, res, next) => {
             .populate("commentCount")
             .populate({
                 path: "liked",
-                match: {user: req.user._id}
+                match: { user: req.user._id }
             });
-        
+
         // 게시물이 없는 경우 404 처리
-        if(!post){
+        if (!post) {
             throw new createError.NotFound("Post is not found");
         }
 
         // 서버의 응답
-        res.json({post});
+        res.json({ post });
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
 exports.create = async (req, res, next) => {
-    try{
+    try {
         // 클라이언트가 전송한 이미지
         const files = req.files;
 
         // 전송한 이미지가 없는 경우
-        if(!files || files.length < 1){
+        if (!files || files.length < 1) {
             // 400 에러 처리
             throw new createError.NotFound("File is required");
         }
@@ -142,19 +142,19 @@ exports.create = async (req, res, next) => {
         await post.save();
 
         // 서버의 응답
-        res.json({post});
+        res.json({ post });
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
 exports.deleteOne = async (req, res, next) => {
-    try{
+    try {
         // 삭제할 게시물을 검색한다.
         const post = await Post.findById(req.params.id);
 
         // 게시물이 없는 경우 404처리
-        if(!post){
+        if (!post) {
             throw new createError.NotFound("Post is not found");
         }
 
@@ -162,7 +162,7 @@ exports.deleteOne = async (req, res, next) => {
         const isMaster = req.user._id.toString() === post.user.toString();
 
         // 본인 게시물이 아닌 경우 400 처리
-        if(!isMaster){
+        if (!isMaster) {
             throw new createError.BadGateway("Incorrect User");
         }
 
@@ -170,28 +170,28 @@ exports.deleteOne = async (req, res, next) => {
         await post.deleteOne();
 
         // 서버의 응답
-        res.json({post});
+        res.json({ post });
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
 exports.like = async (req, res, next) => {
-    try{
+    try {
         // 좋아요 처리할 게시물을 검색한다
         const post = await Post.findById(req.params.id);
 
         // 게시물이 없는 경우 404 처리
-        if(!post){
+        if (!post) {
             throw new createError.NotFound("Post is not found");
         }
 
         // 이미 좋아요 한 게시물인지 확인
         const liked = await Likes
-            .findOne({user: req.user._id, post: post._id});
+            .findOne({ user: req.user._id, post: post._id });
 
         // 좋아요 한 게시물이 아닌 경우 좋아요 처리
-        if(!liked){
+        if (!liked) {
             // Likes 도큐먼트 생성
             const likes = new Likes({
                 user: req.user._id,
@@ -206,28 +206,28 @@ exports.like = async (req, res, next) => {
         }
 
         // 서버의 응답
-        res.json({post});
+        res.json({ post });
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
 exports.unlike = async (req, res, next) => {
-    try{
+    try {
         // 좋아요 취소할 게시물 검색
         const post = await Post.findById(req.params.id);
 
         // 게시물이 없는 경우 404 처리
-        if(!post){
+        if (!post) {
             throw new createError.NotFound("Post is not found");
         }
 
         // 좋아요 한 게시물인지 확인
         const liked = await Likes
-            .findOne({user: req.user._id, post: post._id});
+            .findOne({ user: req.user._id, post: post._id });
 
         // 좋아요 한 게시물이 맞는 경우 취소 처리
-        if(liked){
+        if (liked) {
             // 도큐먼트 삭제
             await liked.deleteOne();
 
@@ -237,9 +237,9 @@ exports.unlike = async (req, res, next) => {
         }
 
         // 서버의 응답
-        res.json({post});
+        res.json({ post });
 
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };

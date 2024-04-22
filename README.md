@@ -261,3 +261,160 @@
     npm run start:watch
     ```
 ***
+
+## Client Setting
+
+**:one: 클라이언트 프로젝트 생성 명령어**
+
+경로: instagram-clone/
+```js
+npx create-react-app client
+```
+
+**:two: 클라이언트에 설치할 패키지**
+1. react-router-dom - 리액트 라우터
+2. tailwindcss - 스타일
+3. react-icons - 아이콘 (svg)
+```js
+npm install react-router-dom tailwindcss react-icons
+```
+
+**:three: 테일윈드 설정파일 생성 명령어**
+
+```js
+npx tailwindcss init
+
+// vite
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+1. tailwind.config.js 설정
+    ```js
+    /** @type {import('tailwindcss').Config} */
+    export default {
+        content: [
+            "./src/**/*.js"
+        ],
+        theme: {
+            extend: {},
+        },
+        plugins: [],
+    }
+
+    /* vite */
+    /** @type {import('tailwindcss').Config} */
+    export default {
+      content: [
+        "./index.html",
+        "./src/**/*.{js,ts,jsx,tsx}",
+      ],
+      theme: {
+        extend: {},
+      },
+      plugins: [],
+    }
+    ```
+
+2. index.css 설정
+    ```css
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+    ```
+
+**:four: service**
+
+> 서버와의 인터페이스 역할
+
+경로: client/src/service/
+
+1. user.js - 유저 관련 요청
+2. profile.js - 프로필 관련 요청
+3. post.js - 게시물 관련 요청
+4. comment.js - 댓글 관련 요청
+5. header.js - 공통 모듈
+
+**:five: 클라이언트의 유틸리티 기능**
+
+경로: client/src/utils/
+
+1. validator - 클라이언트 측 폼데이터 유효성 검사 처리 기능
+
+**:six: 컴포넌트**
+
+1. 경로: client/src/components/auth
+    ```js
+    AuthContext.jsx - 인증 컨텍스트
+    AuthProvider.jsx - 유저 데이터 관리
+    AuthRequired.jsx - 인증 검사
+    ```
+
+2. 경로: client/src/components/comments
+    ```js
+    Comments.jsx - 댓글페이지
+    Comment.jsx - 각각의 댓글
+    Form.jsx - 댓글 작성 폼
+    ```
+
+
+3. 경로: client/src/components/post-template
+    ```js
+    Carousel.jsx - 게시물 상세보기 페이지의 캐러셀
+    Modal.jsx - 게시물 상세보기 페이지의 모달
+    PostTemplate.jsx - 게시물 상세보기 페이지 (피드에서도 사용)
+    ```
+
+4. 경로: client/src/components/
+    ```js
+    Explore.jsx - 유저 검색 페이지
+    Feed.jsx - 피드
+    Followers.jsx - 팔로워 목록
+    Following.jsx - 팔로잉 목록
+    Layout.jsx - 레이아웃 (메뉴 등)
+    Login.jsx - 로그인
+    NotFound.jsx - 404 페이지
+    PostForm.jsx - 게시물 등록
+    PostView.jsx - 게시물 상세보기 페이지
+    Profile.jsx - 프로필
+    ProfileEdit.jsx - 프로필 수정
+    SignUp.jsx - 가입
+    ```
+
+**:seven: 리액트 서버 포트**
+>리액트 서버 포트를 3001번으로 고정 시킨다.  
+(vite 사용경우 5173 포트를 사용해서 따로 설정 안해도 된다.)
+
+1. 서버를 실행하는 명령어
+
+    ```js
+    // 윈도우
+    "scripts": {
+        "start": "set PORT=3001 && react-scripts start",
+    },
+
+    set PORT=3001 && react-scripts start
+
+    // 맥
+    PORT=3001 react-scripts start
+    ```
+
+2. 서버 실행 명령어
+    ```js
+    npm start
+    ```
+
+3. 리액트 서버 주소
+    ```js
+    localhost:3001
+    ```
+
+**:eight: 클라이언트 작업 시**
+>백 서버 실행   
+클라이언트 서버 실행
+
+**:nine: 에러 종류**
+1. Failed to fecth -> 요청 실패 (클라이언트 서비스 확인)
+2. NotFound, BadRequest 등 -> 잘못된 요청 (서버에 문제가 없을 경우)
+3. 클라이언측 404 발생 -> 클라이언트 라우팅 문제 (요청 주소 라우터 path 비교)
+***

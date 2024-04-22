@@ -46,7 +46,7 @@ router.delete("/posts/:id/unlike", auth, postController.unlike);
 // Comment 라우터
 router.get("/posts/:id/comments", auth, commentController.find);
 router.post("/posts/:id/comments", auth, commentController.create);
-router.delete("/posts/:id/comments/:id", auth, commentController.deleteOne);
+router.delete("/posts/comments/:id", auth, commentController.deleteOne);
 
 // Profile 라우터
 router.get("/profiles", auth, profileController.find);
